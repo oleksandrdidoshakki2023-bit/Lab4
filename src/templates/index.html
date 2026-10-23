@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block title %}Second Brain — Нотатки{% endblock %}
+
+{% block content %}
+<div class="layout">
+
+  <!-- Бічна панель -->
+  <aside class="sidebar">
+    <h3>Категорії</h3>
+    <ul>
+      <li>
+        <a href="{{ url_for('index', q=query or None) }}"
+           class="{{ 'active' if not current_category }}">Усі</a>
+      </li>
+      {% for cat in categories %}
+      <li>
+        <a href="{{ url_for('index', category=cat, q=query or None, tag=current_tag or None) }}"
+           class="{{ 'active' if current_category == cat }}">{{ cat }}</a>
+      </li>
+      {% endfor %}
+    </ul>
+
+    <h3>Теги</h3>
+    <div class="tag-cloud">
+      {% for tag in all_tags %}
+      <a href="{{ url_for('index', tag=tag, q=query or None, category=current_category or None) }}"
+         class="tag-chip {{ 'active' if current_tag == tag }}">{{ tag }}</a>
+      {% endfor %}
+      {% if not all_tags %}
+      <span style="color:#aaa; font-size:.85rem;">Тегів немає</span>
+      {% endif %}
+    </div>
+  </aside>
+
+  <!-- Основний контент -->
+  <section class="content">
+
+    <!-- Пошук -->
+    <form class="search-form" method="get" action="{{ url_for('index') }}">
+      <input type="text" name="q" value="{{ query }}" placeholder="Пошук нотаток…">
+      {% if current_tag %}
+      <input type="hidden" name="tag" value="{{ current_tag }}">
+      {% endif %}
+      {% if current_category %}
+      <input type="hidden" name="category" value="{{ current_category }}">
+      {% endif %}
+      <button type="submit">Шукати</button>
+    </form>
+
+    <!-- Активні фільтри -->
+    {% if current_category or current_tag %}
+    <div class="active-filters">
+      {% if current_category %}
+      <span class="filter-badge">
+        Категорія: {{ current_category }}
+        <a href="{{ url_for('index', q=query or None, tag=current_tag or None) }}">✕</a>
+      </span>
+      {% endif %}
+      {% if current_tag %}
+      <span class="filter-badge">
+        Тег: {{ current_tag }}
+        <a href="{{ url_for('index', q=query or None, category=current_category or None) }}">✕</a>
+      </span>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- Список нотаток -->
+    {% if notes %}
+    <p class="results-count">Знайдено: {{ total }}</p>
+    {% for note in notes %}
+    <div class="note-card">
+      <a href="{{ url_for('view_note', category=note.category, filename=note.filename) }}"
+         class="note-title">{{ note.title }}</a>
+      <div class="note-meta">
+        <span class="category-badge">{{ note.category }}</span>
+        <span>{{ note.updated[:10] if note.updated|length >= 10 else note.updated }}</span>
+        {% if note.status %}
+        <span>• {{ note.status }}</span>
+        {% endif %}
+      </div>
+      {% if note.tags %}
+      <div class="note-tags">
+        {% for tag in note.tags %}
+        <span class="tag-chip">{{ tag }}</span>
+        {% endfor %}
+      </div>
+      {% endif %}
+      {% if note.content %}
+      <p class="note-preview">{{ note.content[:100] }}{% if note.content|length > 100 %}…{% endif %}</p>
+      {% endif %}
+    </div>
+    {% endfor %}
+    {% else %}
+    <p class="empty-state">Нічого не знайдено</p>
+    {% endif %}
+
+  </section>
+</div>
+{% endblock %}
