@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}{{ note.title }} — Second Brain{% endblock %}
+
+{% block content %}
+<div class="note-page">
+
+  <!-- Хлібні крихти -->
+  <div class="breadcrumb">
+    <a href="{{ url_for('index') }}">Головна</a> ›
+    <a href="{{ url_for('index', category=note.category) }}">{{ note.category }}</a> ›
+    {{ note.title }}
+  </div>
+
+  <h1>{{ note.title }}</h1>
+
+  <!-- Метадані -->
+  <div class="note-meta-block">
+    <span><span class="label">Категорія:</span> {{ note.category }}</span>
+    <span><span class="label">Тип:</span> {{ note.type }}</span>
+    <span><span class="label">Статус:</span> {{ note.status }}</span>
+    <span><span class="label">Створено:</span> {{ note.created[:10] if note.created|length >= 10 else note.created }}</span>
+    <span><span class="label">Оновлено:</span> {{ note.updated[:10] if note.updated|length >= 10 else note.updated }}</span>
+    {% if note.source %}
+    <span><span class="label">Джерело:</span> {{ note.source }}</span>
+    {% endif %}
+  </div>
+
+  <!-- Теги -->
+  {% if note.tags %}
+  <div class="note-tags" style="margin-bottom: 1rem;">
+    {% for tag in note.tags %}
+    <a href="{{ url_for('index', tag=tag) }}" class="tag-chip">{{ tag }}</a>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- Дії -->
+  <div class="note-actions">
+    <a href="{{ url_for('edit_note', category=note.category, filename=note.filename) }}">✏️ Редагувати</a>
+  </div>
+
+  <!-- Тіло нотатки -->
+  <div class="note-body">
+    {{ html_content | safe }}
+  </div>
+
+  <!-- Зворотні посилання -->
+  {% if backlinks %}
+  <div class="backlinks">
+    <h3>🔗 Посилаються сюди</h3>
+    <ul>
+      {% for bl in backlinks %}
+      <li>
+        <a href="{{ url_for('view_note', category=bl.category, filename=bl.filename) }}">
+          {{ bl.title }}
+        </a>
+        <span style="color:#888; font-size:.8rem;"> ({{ bl.category }})</span>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

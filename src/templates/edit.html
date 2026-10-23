@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Редагувати' if note else 'Нова нотатка' }} — Second Brain{% endblock %}
+
+{% block content %}
+<div class="edit-page">
+  <h1>{{ '✏️ Редагувати нотатку' if note else '📝 Нова нотатка' }}</h1>
+
+  <form method="post">
+    <div class="form-group">
+      <label for="title">Назва</label>
+      <input type="text" id="title" name="title"
+             value="{{ note.title if note else '' }}" required
+             placeholder="Введіть назву нотатки…">
+    </div>
+
+    <div class="form-group">
+      <label for="content">Зміст (Markdown)</label>
+      <textarea id="content" name="content"
+                placeholder="Текст нотатки у форматі Markdown…">{{ note.content if note else '' }}</textarea>
+    </div>
+
+    <div class="form-group">
+      <label for="tags">Теги (через кому)</label>
+      <input type="text" id="tags" name="tags"
+             value="{{ note.tags | join(', ') if note and note.tags else '' }}"
+             placeholder="python, flask, web">
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="type">Тип</label>
+        <select id="type" name="type">
+          <option value="note" {{ 'selected' if not note or note.type == 'note' }}>note</option>
+          <option value="moc" {{ 'selected' if note and note.type == 'moc' }}>moc</option>
+        </select>
+      </div>
+
+      {% if note %}
+      <div class="form-group">
+        <label for="status">Статус</label>
+        <select id="status" name="status">
+          <option value="inbox" {{ 'selected' if note.status == 'inbox' }}>inbox</option>
+          <option value="active" {{ 'selected' if note.status == 'active' }}>active</option>
+          <option value="archived" {{ 'selected' if note.status == 'archived' }}>archived</option>
+        </select>
+      </div>
+      {% endif %}
+    </div>
+
+    <div class="form-group">
+      <label for="source">Джерело</label>
+      <input type="text" id="source" name="source"
+             value="{{ note.source if note and note.source else '' }}"
+             placeholder="Наприклад: власний конспект">
+    </div>
+
+    {% if note %}
+    <p style="font-size:.8rem; color:#888; margin-bottom:1rem;">
+      Категорія: <strong>{{ note.category }}</strong> · Файл: {{ note.filename }}
+    </p>
+    {% else %}
+    <p style="font-size:.8rem; color:#888; margin-bottom:1rem;">
+      Нова нотатка буде створена в категорії <strong>Inbox</strong>.
+    </p>
+    {% endif %}
+
+    <button type="submit" class="btn-save">💾 Зберегти</button>
+  </form>
+</div>
+{% endblock %}
