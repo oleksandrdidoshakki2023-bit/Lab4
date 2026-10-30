@@ -93,10 +93,10 @@ def filter_by(notes, tag=None, category=None):
 # ---------------------------------------------------------------------------
 
 def find_note_by_title(notes, title):
-    """Знайти нотатку за title (без урахування регістру)."""
-    t = title.lower()
+    """Знайти нотатку за title (без урахування регістру та зайвих пробілів)."""
+    t = title.strip().casefold()
     for n in notes:
-        if n['title'].lower() == t:
+        if n['title'].strip().casefold() == t:
             return n
     return None
 
